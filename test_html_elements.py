@@ -2,22 +2,32 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 import unittest
+import time
 
-class TestInventory(unittest.TestCase):
+class TestShoppingList(unittest.TestCase):
     def setUp(self):
         options = Options()
         options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
 
-    def test_inventory_display(self):
+    def test_shopping_page_loads(self):
         driver = self.driver
-        driver.get("http://10.48.10.217")  # Use actual app host
+        driver.get("http://10.48.10.181")
+        time.sleep(2)
+        self.assertIn("Shopping", driver.page_source)
 
-        for i in range(10):
-            item_name = f'Item {i}'
-            assert item_name in driver.page_source, f"{item_name} not found in page source"
+    def test_add_shopping_item(self):
+        driver = self.driver
+        driver.get("http://10.48.10.181")
+        time.sleep(2)
 
-        print("All test inventory items verified.")
+        driver.find_element(By.NAME, "name").send_keys("Milk")
+        driver.find_element(By.NAME, "quantity").clear()
+        driver.find_element(By.NAME, "quantity").send_keys("2")
+        driver.find_element(By.XPATH, "//input[@type='submit']").click()
+        time.sleep(2)
+
+        self.assertIn("Milk", driver.page_source)
 
     def tearDown(self):
         self.driver.quit()
