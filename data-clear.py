@@ -9,7 +9,7 @@ def clear_inventory():
     db = connect_db()
     db.execute("DELETE FROM inventory WHERE name LIKE 'Item %'")
     db.commit()
-    print('Inventory test items cleared.')
+    print('Test inventory items cleared.')
     db.close()
 
 if __name__ == '__main__':
