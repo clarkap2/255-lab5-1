@@ -58,7 +58,7 @@ def index():
     items = db.execute('SELECT * FROM inventory').fetchall()
 
     return render_template_string('''
-        <h2>Inventory Management</h2>
+        <h2>Store Inventory</h2>
         <form method="POST">
             <label>Item Name:</label><br>
             <input type="text" name="name" required><br>
@@ -103,7 +103,7 @@ def index():
         {% endif %}
     ''', message=message, items=items)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     init_db()
     app.run(debug=True, host='0.0.0.0', port=port)
