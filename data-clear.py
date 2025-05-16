@@ -7,8 +7,8 @@ def connect_db():
     return sqlite3.connect(DATABASE)
 
 def is_junk_entry(name):
-    junk_patterns = ['<script', 'alert(', 'sqlmap', '--', 'UNION']
-    for pattern in junk_patterns:
+    patterns = ['<script', 'alert(', '--', 'sqlmap', 'UNION']
+    for pattern in patterns:
         if pattern.lower() in name.lower():
             return True
     if re.fullmatch(r'[a-z0-9]{5,10}', name):
