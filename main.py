@@ -1,9 +1,9 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, redirect, url_for
 import sqlite3
 import os
 
 app = Flask(__name__)
-DATABASE = 'demo.db'  # Changed from /nfs/demo.db
+DATABASE = 'demo.db'
 
 def get_db():
     db = sqlite3.connect(DATABASE)
@@ -14,11 +14,10 @@ def init_db():
     with app.app_context():
         db = get_db()
         db.execute('''
-            CREATE TABLE IF NOT EXISTS shopping (
+            CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                quantity INTEGER DEFAULT 1,
-                status TEXT DEFAULT 'Needed'
+                title TEXT NOT NULL,
+                status TEXT DEFAULT 'Unread'
             );
         ''')
         db.commit()
@@ -29,82 +28,76 @@ def index():
     db = get_db()
 
     if request.method == 'POST':
-        action = request.form.get('action')
-
-        if action == 'delete':
-            item_id = request.form.get('item_id')
-            db.execute('DELETE FROM shopping WHERE id = ?', (item_id,))
+        if request.form.get('action') == 'delete':
+            book_id = request.form.get('book_id')
+            db.execute('DELETE FROM books WHERE id = ?', (book_id,))
             db.commit()
-            message = 'Item deleted.'
-
-        elif action == 'update':
-            item_id = request.form.get('item_id')
+            message = 'Book deleted successfully.'
+        elif request.form.get('action') == 'update':
+            book_id = request.form.get('book_id')
             new_status = request.form.get('status')
-            db.execute('UPDATE shopping SET status = ? WHERE id = ?', (new_status, item_id))
+            db.execute('UPDATE books SET status = ? WHERE id = ?', (new_status, book_id))
             db.commit()
-            message = 'Item status updated.'
-
+            message = 'Book status updated.'
         else:
-            name = request.form.get('name')
-            quantity = int(request.form.get('quantity', 1))
-            if name:
-                db.execute('INSERT INTO shopping (name, quantity) VALUES (?, ?)', (name, quantity))
+            title = request.form.get('title')
+            if title:
+                db.execute('INSERT INTO books (title) VALUES (?)', (title,))
                 db.commit()
-                message = 'Item added.'
+                message = 'Book added successfully.'
             else:
-                message = 'Missing item name.'
+                message = 'Missing book title.'
 
-    items = db.execute('SELECT * FROM shopping').fetchall()
+    books = db.execute('SELECT * FROM books').fetchall()
     return render_template_string('''
         <!DOCTYPE html>
         <html>
-        <head><title>Shopping List</title></head>
+        <head><title>Book Tracker</title></head>
         <body>
-            <h2>Shopping List</h2>
-            <form method="POST">
-                <input type="text" name="name" placeholder="Item name" required>
-                <input type="number" name="quantity" min="1" value="1">
-                <input type="submit" value="Add Item">
+            <h2>Add Book</h2>
+            <form method="POST" action="/">
+                <input type="text" name="title" placeholder="Enter a book title" required>
+                <input type="submit" value="Add Book">
             </form>
             <p>{{ message }}</p>
-            {% if items %}
-            <table border="1">
-                <tr><th>Name</th><th>Qty</th><th>Status</th><th>Update</th><th>Delete</th></tr>
-                {% for item in items %}
-                <tr>
-                    <td>{{ item['name'] }}</td>
-                    <td>{{ item['quantity'] }}</td>
-                    <td>{{ item['status'] }}</td>
-                    <td>
-                        <form method="POST">
-                            <input type="hidden" name="item_id" value="{{ item['id'] }}">
-                            <select name="status">
-                                <option value="Needed" {% if item['status'] == 'Needed' %}selected{% endif %}>Needed</option>
-                                <option value="Purchased" {% if item['status'] == 'Purchased' %}selected{% endif %}>Purchased</option>
-                                <option value="Not Available" {% if item['status'] == 'Not Available' %}selected{% endif %}>Not Available</option>
-                            </select>
-                            <input type="hidden" name="action" value="update">
-                            <input type="submit" value="Update">
-                        </form>
-                    </td>
-                    <td>
-                        <form method="POST">
-                            <input type="hidden" name="item_id" value="{{ item['id'] }}">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="submit" value="Delete">
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
+            <h3>Book List</h3>
+            {% if books %}
+                <table border="1">
+                    <tr><th>Title</th><th>Status</th><th>Update</th><th>Delete</th></tr>
+                    {% for book in books %}
+                    <tr>
+                        <td>{{ book['title'] }}</td>
+                        <td>{{ book['status'] }}</td>
+                        <td>
+                            <form method="POST" action="/">
+                                <input type="hidden" name="book_id" value="{{ book['id'] }}">
+                                <select name="status">
+                                    <option value="Unread" {% if book['status'] == 'Unread' %}selected{% endif %}>Unread</option>
+                                    <option value="Reading" {% if book['status'] == 'Reading' %}selected{% endif %}>Reading</option>
+                                    <option value="Read" {% if book['status'] == 'Read' %}selected{% endif %}>Read</option>
+                                </select>
+                                <input type="hidden" name="action" value="update">
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <form method="POST" action="/">
+                                <input type="hidden" name="book_id" value="{{ book['id'] }}">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="submit" value="Delete">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
             {% else %}
-            <p>No shopping items yet.</p>
+                <p>No books in your list yet.</p>
             {% endif %}
         </body>
         </html>
-    ''', message=message, items=items)
+    ''', message=message, books=books)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     init_db()
     app.run(debug=True, host='0.0.0.0', port=port)
