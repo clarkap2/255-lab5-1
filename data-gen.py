@@ -1,6 +1,6 @@
 import sqlite3
 
-DATABASE = '/nfs/demo.db'
+DATABASE = 'demo.db'  # Changed from /nfs/demo.db
 
 def connect_db():
     return sqlite3.connect(DATABASE)
