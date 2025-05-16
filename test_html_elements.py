@@ -5,20 +5,19 @@ import unittest
 
 class TestInventory(unittest.TestCase):
     def setUp(self):
-        firefox_options = Options()
-        firefox_options.add_argument("--headless")
-        self.driver = webdriver.Firefox(options=firefox_options)
+        options = Options()
+        options.add_argument("--headless")
+        self.driver = webdriver.Firefox(options=options)
 
-    def test_inventory(self):
+    def test_inventory_display(self):
         driver = self.driver
-        driver.get("http://10.48.10.217")  # Use the actual host
+        driver.get("http://10.48.10.217")  # Use actual app host
 
-        # Verify presence of test items
         for i in range(10):
             item_name = f'Item {i}'
-            assert item_name in driver.page_source, f"{item_name} not found!"
+            assert item_name in driver.page_source, f"{item_name} not found in page source"
 
-        print("Inventory test passed!")
+        print("All test inventory items verified.")
 
     def tearDown(self):
         self.driver.quit()
