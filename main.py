@@ -44,7 +44,7 @@ def index():
             db.commit()
             message = 'Item status updated.'
 
-        else:  # Add new item
+        else:
             name = request.form.get('name')
             quantity = int(request.form.get('quantity', 1))
             if name:
@@ -56,46 +56,52 @@ def index():
 
     items = db.execute('SELECT * FROM shopping').fetchall()
     return render_template_string('''
-        <h2>Shopping List</h2>
-        <form method="POST">
-            <input type="text" name="name" placeholder="Item name" required>
-            <input type="number" name="quantity" min="1" value="1">
-            <input type="submit" value="Add Item">
-        </form>
-        <p>{{ message }}</p>
-        {% if items %}
-        <table border="1">
-            <tr><th>Name</th><th>Qty</th><th>Status</th><th>Update</th><th>Delete</th></tr>
-            {% for item in items %}
-            <tr>
-                <td>{{ item['name'] }}</td>
-                <td>{{ item['quantity'] }}</td>
-                <td>{{ item['status'] }}</td>
-                <td>
-                    <form method="POST">
-                        <input type="hidden" name="item_id" value="{{ item['id'] }}">
-                        <select name="status">
-                            <option value="Needed" {% if item['status'] == 'Needed' %}selected{% endif %}>Needed</option>
-                            <option value="Purchased" {% if item['status'] == 'Purchased' %}selected{% endif %}>Purchased</option>
-                            <option value="Not Available" {% if item['status'] == 'Not Available' %}selected{% endif %}>Not Available</option>
-                        </select>
-                        <input type="hidden" name="action" value="update">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>
-                    <form method="POST">
-                        <input type="hidden" name="item_id" value="{{ item['id'] }}">
-                        <input type="hidden" name="action" value="delete">
-                        <input type="submit" value="Delete">
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <p>No shopping items yet.</p>
-        {% endif %}
+        <!DOCTYPE html>
+        <html>
+        <head><title>Shopping List</title></head>
+        <body>
+            <h2>Shopping List</h2>
+            <form method="POST">
+                <input type="text" name="name" placeholder="Item name" required>
+                <input type="number" name="quantity" min="1" value="1">
+                <input type="submit" value="Add Item">
+            </form>
+            <p>{{ message }}</p>
+            {% if items %}
+            <table border="1">
+                <tr><th>Name</th><th>Qty</th><th>Status</th><th>Update</th><th>Delete</th></tr>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item['name'] }}</td>
+                    <td>{{ item['quantity'] }}</td>
+                    <td>{{ item['status'] }}</td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="item_id" value="{{ item['id'] }}">
+                            <select name="status">
+                                <option value="Needed" {% if item['status'] == 'Needed' %}selected{% endif %}>Needed</option>
+                                <option value="Purchased" {% if item['status'] == 'Purchased' %}selected{% endif %}>Purchased</option>
+                                <option value="Not Available" {% if item['status'] == 'Not Available' %}selected{% endif %}>Not Available</option>
+                            </select>
+                            <input type="hidden" name="action" value="update">
+                            <input type="submit" value="Update">
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="item_id" value="{{ item['id'] }}">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="submit" value="Delete">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p>No shopping items yet.</p>
+            {% endif %}
+        </body>
+        </html>
     ''', message=message, items=items)
 
 if __name__ == '__main__':
