@@ -3,7 +3,7 @@ import sqlite3
 import os
 
 app = Flask(__name__)
-DATABASE = '/nfs/demo.db'
+DATABASE = 'demo.db'  # Changed from /nfs/demo.db
 
 def get_db():
     db = sqlite3.connect(DATABASE)
