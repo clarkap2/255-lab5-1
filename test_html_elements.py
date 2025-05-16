@@ -4,34 +4,34 @@ from selenium.webdriver.firefox.options import Options
 import unittest
 import time
 
-class TestShoppingList(unittest.TestCase):
+class TestBooks(unittest.TestCase):
     def setUp(self):
         options = Options()
         options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
 
-    def test_shopping_page_loads(self):
+    def test_books_display(self):
         driver = self.driver
         driver.get("http://10.48.10.181")
-        time.sleep(3)
-        self.assertIn("Shopping List", driver.page_source)
+        time.sleep(2)
+        self.assertIn("Book", driver.page_source)
 
-    def test_add_shopping_item(self):
+        book_rows = driver.find_elements(By.XPATH, "//table//tr")
+        self.assertGreater(len(book_rows), 1, "No books found in the table")
+
+    def test_add_book(self):
         driver = self.driver
         driver.get("http://10.48.10.181")
-        time.sleep(3)
-
-        name_input = driver.find_element(By.NAME, "name")
-        quantity_input = driver.find_element(By.NAME, "quantity")
-
-        name_input.send_keys("Milk")
-        quantity_input.clear()
-        quantity_input.send_keys("2")
-
-        driver.find_element(By.XPATH, "//input[@type='submit']").click()
         time.sleep(2)
 
-        self.assertIn("Milk", driver.page_source)
+        title_input = driver.find_element(By.NAME, "title")
+        title_input.send_keys("Test Book")
+
+        submit_button = driver.find_element(By.XPATH, "//input[@type='submit']")
+        submit_button.click()
+        time.sleep(2)
+
+        self.assertIn("Test Book", driver.page_source)
 
     def tearDown(self):
         self.driver.quit()
