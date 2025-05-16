@@ -1,18 +1,18 @@
 import sqlite3
 
-DATABASE = 'demo.db'  # Changed from /nfs/demo.db
+DATABASE = 'demo.db'
 
 def connect_db():
     return sqlite3.connect(DATABASE)
 
-def generate_test_items(num_items):
+def generate_test_books(num_books):
     db = connect_db()
-    for i in range(num_items):
-        name = f'Test Item {i}'
-        db.execute('INSERT INTO shopping (name, quantity, status) VALUES (?, ?, ?)', (name, i+1, 'Needed'))
+    for i in range(num_books):
+        title = f'Test Book {i}'
+        db.execute('INSERT INTO books (title, status) VALUES (?, ?)', (title, 'Unread'))
     db.commit()
-    print(f'{num_items} test shopping items added.')
+    print(f'{num_books} test books added to the database.')
     db.close()
 
 if __name__ == '__main__':
-    generate_test_items(10)
+    generate_test_books(10)
