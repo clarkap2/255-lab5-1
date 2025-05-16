@@ -5,16 +5,14 @@ DATABASE = '/nfs/demo.db'
 def connect_db():
     return sqlite3.connect(DATABASE)
 
-def generate_test_inventory(num_items):
+def generate_test_items(num_items):
     db = connect_db()
     for i in range(num_items):
-        name = f'Item {i}'
-        category = f'Category {i % 3}'
-        quantity = i * 5
-        db.execute('INSERT INTO inventory (name, category, quantity) VALUES (?, ?, ?)', (name, category, quantity))
+        name = f'Test Item {i}'
+        db.execute('INSERT INTO shopping (name, quantity, status) VALUES (?, ?, ?)', (name, i+1, 'Needed'))
     db.commit()
-    print(f'{num_items} inventory items added.')
+    print(f'{num_items} test shopping items added.')
     db.close()
 
 if __name__ == '__main__':
-    generate_test_inventory(10)
+    generate_test_items(10)
