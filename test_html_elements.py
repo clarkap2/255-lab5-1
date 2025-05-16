@@ -13,17 +13,21 @@ class TestShoppingList(unittest.TestCase):
     def test_shopping_page_loads(self):
         driver = self.driver
         driver.get("http://10.48.10.181")
-        time.sleep(2)
-        self.assertIn("Shopping", driver.page_source)
+        time.sleep(3)
+        self.assertIn("Shopping List", driver.page_source)
 
     def test_add_shopping_item(self):
         driver = self.driver
         driver.get("http://10.48.10.181")
-        time.sleep(2)
+        time.sleep(3)
 
-        driver.find_element(By.NAME, "name").send_keys("Milk")
-        driver.find_element(By.NAME, "quantity").clear()
-        driver.find_element(By.NAME, "quantity").send_keys("2")
+        name_input = driver.find_element(By.NAME, "name")
+        quantity_input = driver.find_element(By.NAME, "quantity")
+
+        name_input.send_keys("Milk")
+        quantity_input.clear()
+        quantity_input.send_keys("2")
+
         driver.find_element(By.XPATH, "//input[@type='submit']").click()
         time.sleep(2)
 
