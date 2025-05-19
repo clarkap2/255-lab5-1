@@ -21,7 +21,7 @@ class TestBooks(unittest.TestCase):
 
     def test_add_book(self):
         driver = self.driver
-        driver.get("http://10.48.10.181")
+        driver.get("http://10.48.10.217")
         time.sleep(2)
 
         title_input = driver.find_element(By.NAME, "title")
